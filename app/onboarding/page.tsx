@@ -1,18 +1,16 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
+import { useState, useTransition } from "react"
 import { C, inputStyle, primaryBtn } from "@/lib/constants"
 import { Wordmark } from "@/components/Wordmark"
+import { createHouseAction, joinHouseAction } from "@/app/actions/onboarding"
 
 type Mode = "crea" | "entra"
 
 export default function OnboardingPage() {
-  const router = useRouter()
   const [mode, setMode] = useState<Mode>("crea")
-  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
 
   const [address, setAddress] = useState("")
   const [city, setCity] = useState("")
@@ -23,90 +21,31 @@ export default function OnboardingPage() {
   const [roomLabelEntra, setRoomLabelEntra] = useState("")
   const [monthlyRentEntra, setMonthlyRentEntra] = useState("")
 
-  async function handleCrea(e: React.FormEvent) {
+  function handleCrea(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
-    setLoading(true)
-
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
-      router.push("/auth/login")
-      return
-    }
-
-    const { data: house, error: houseErr } = await supabase
-      .from("houses")
-      .insert({ address, city })
-      .select()
-      .single()
-
-    if (houseErr || !house) {
-      setError(`[houses INSERT] uid=${user.id} code=${houseErr?.code} msg=${houseErr?.message}`)
-      setLoading(false)
-      return
-    }
-
-    const { error: memberErr } = await supabase.from("house_members").insert({
-      house_id: house.id,
-      user_id: user.id,
-      room_label: roomLabel || null,
-      monthly_rent: parseFloat(monthlyRent) || 0,
+    startTransition(async () => {
+      const result = await createHouseAction({
+        address,
+        city,
+        roomLabel,
+        monthlyRent: parseFloat(monthlyRent) || 0,
+      })
+      if (result?.error) setError(result.error)
     })
-
-    if (memberErr) {
-      setError(`[house_members INSERT] code=${memberErr?.code} msg=${memberErr?.message} hint=${memberErr?.hint}`)
-      setLoading(false)
-      return
-    }
-
-    router.push("/casa")
   }
 
-  async function handleEntra(e: React.FormEvent) {
+  function handleEntra(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
-    setLoading(true)
-
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
-      router.push("/auth/login")
-      return
-    }
-
-    const { data: house, error: houseErr } = await supabase
-      .from("houses")
-      .select("id")
-      .eq("invite_code", inviteCode.trim().toLowerCase())
-      .single()
-
-    if (houseErr || !house) {
-      setError("Codice non trovato. Richiedi il codice al tuo coinquilino.")
-      setLoading(false)
-      return
-    }
-
-    const { error: memberErr } = await supabase.from("house_members").insert({
-      house_id: house.id,
-      user_id: user.id,
-      room_label: roomLabelEntra || null,
-      monthly_rent: parseFloat(monthlyRentEntra) || 0,
+    startTransition(async () => {
+      const result = await joinHouseAction({
+        inviteCode,
+        roomLabel: roomLabelEntra,
+        monthlyRent: parseFloat(monthlyRentEntra) || 0,
+      })
+      if (result?.error) setError(result.error)
     })
-
-    if (memberErr) {
-      if (memberErr.code === "23505") {
-        setError("Sei già membro di questa casa.")
-      } else {
-        setError("Qualcosa non ha funzionato, riprova.")
-      }
-      setLoading(false)
-      return
-    }
-
-    router.push("/casa")
   }
 
   const modeBtn = (m: Mode, label: string, sub: string) => {
@@ -188,8 +127,8 @@ export default function OnboardingPage() {
                 </div>
               )}
 
-              <button type="submit" disabled={loading || !address.trim()} style={{ ...primaryBtn, marginTop: 4, opacity: (loading || !address.trim()) ? 0.5 : 1 }}>
-                {loading ? "Creazione in corso…" : "Crea casa →"}
+              <button type="submit" disabled={isPending || !address.trim()} style={{ ...primaryBtn, marginTop: 4, opacity: (isPending || !address.trim()) ? 0.5 : 1 }}>
+                {isPending ? "Creazione in corso…" : "Crea casa →"}
               </button>
             </form>
           ) : (
@@ -230,8 +169,8 @@ export default function OnboardingPage() {
                 </div>
               )}
 
-              <button type="submit" disabled={loading || !inviteCode.trim()} style={{ ...primaryBtn, marginTop: 4, opacity: (loading || !inviteCode.trim()) ? 0.5 : 1 }}>
-                {loading ? "Verifica in corso…" : "Entra →"}
+              <button type="submit" disabled={isPending || !inviteCode.trim()} style={{ ...primaryBtn, marginTop: 4, opacity: (isPending || !inviteCode.trim()) ? 0.5 : 1 }}>
+                {isPending ? "Verifica in corso…" : "Entra →"}
               </button>
             </form>
           )}
