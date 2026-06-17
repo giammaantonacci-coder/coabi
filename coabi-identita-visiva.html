@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Coabi — Identità visiva</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400..700&family=Hanken+Grotesque:wght@400;500;600;700&display=swap');
+
+  :root{
+    --paper:#FFFFFF;
+    --ink:#1B201A;
+    --sub:#6B7268;
+    --line:#E7E4D9;
+    --sage:#3A554C;
+    --sage-soft:#E4EDE7;
+    --coral:#CF5F49;
+    --coral-soft:#F6E2DC;
+    --honey:#CC8E2E;
+    --honey-soft:#F4E8CF;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Hanken Grotesque', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .sheet{ max-width:860px; margin:0 auto; padding: clamp(28px,6vw,72px) clamp(20px,6vw,40px) 90px; }
+
+  .eyebrow{
+    font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--sub); display:flex; align-items:center; gap:10px; margin-bottom:46px;
+  }
+  .eyebrow::after{ content:""; flex:1; height:1px; background:var(--line); }
+
+  /* ── Hero / wordmark ── */
+  .hero{ padding-bottom:34px; border-bottom:1px solid var(--line); margin-bottom:40px; }
+  .wordmark{
+    display:inline-flex; align-items:baseline;
+    font-family:'Familjen Grotesk', sans-serif;
+    font-weight:700; letter-spacing:-0.02em;
+    color:var(--sage); font-size: clamp(64px, 13vw, 116px); line-height:1;
+  }
+  .wordmark .a-mark{ position:relative; display:inline-block; width:0.56em; height:0.52em; margin:0 0.025em; }
+  .wordmark .a-mark .shape{ position:absolute; inset:0; background:var(--coral); clip-path:polygon(50% 0%, 100% 38%, 100% 100%, 0% 100%, 0% 38%); border-radius:2px; }
+  .tagline{ margin-top:14px; font-size:clamp(15px,2.6vw,18px); color:var(--sub); font-weight:500; }
+  .signature-note{
+    margin-top:22px; font-size:13px; color:var(--sub); max-width:480px; line-height:1.55;
+    display:flex; gap:10px;
+  }
+  .signature-note .mark{ flex-shrink:0; width:16px; height:14px; margin-top:3px; background:var(--coral); clip-path:polygon(50% 0%, 100% 38%, 100% 100%, 0% 100%, 0% 38%); }
+
+  /* ── Sections ── */
+  section{ margin-bottom:52px; }
+  .sec-label{ font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--sub); margin-bottom:18px; }
+
+  /* Palette */
+  .pal-group{ margin-bottom:22px; }
+  .pal-group-label{ font-size:13px; font-weight:600; color:var(--ink); margin-bottom:10px; }
+  .swatch-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; }
+  .swatch{ border:1px solid var(--line); border-radius:14px; overflow:hidden; }
+  .swatch .fill{ height:64px; }
+  .swatch .meta{ padding:10px 12px; }
+  .swatch .role{ font-size:12.5px; font-weight:600; }
+  .swatch .hex{ font-size:11.5px; color:var(--sub); margin-top:2px; font-family: monospace; }
+
+  /* Typography */
+  .type-block{ border:1px solid var(--line); border-radius:16px; padding:24px 26px; margin-bottom:14px; }
+  .type-role{ font-size:11.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--sub); margin-bottom:4px; }
+  .type-name{ font-size:14px; color:var(--ink); font-weight:600; margin-bottom:16px; }
+  .type-sample-display{ font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:clamp(30px,6vw,44px); letter-spacing:-0.015em; color:var(--ink); line-height:1.1; }
+  .type-sample-body{ font-family:'Hanken Grotesque',sans-serif; font-size:16px; color:var(--ink); line-height:1.6; max-width:460px; }
+  .type-rationale{ font-size:13px; color:var(--sub); margin-top:14px; line-height:1.5; }
+  .weights{ display:flex; gap:18px; margin-top:14px; flex-wrap:wrap; }
+  .weights span{ font-size:13px; color:var(--sub); }
+  .weights b{ color:var(--ink); }
+
+  /* In context */
+  .chips{ display:flex; flex-wrap:wrap; gap:10px; }
+  .chip{ padding:10px 16px; border-radius:99px; font-size:14px; font-weight:600; font-family:'Hanken Grotesque',sans-serif; }
+  .chip.sage{ background:var(--sage-soft); color:var(--sage); }
+  .chip.coral{ background:var(--coral-soft); color:var(--coral); }
+  .chip.honey{ background:var(--honey-soft); color:#8a5f1c; }
+
+  /* App icon */
+  .icon-row{ display:flex; align-items:center; gap:22px; flex-wrap:wrap; }
+  .app-icon{ width:72px; height:72px; border-radius:20px; background:var(--sage); display:flex; align-items:center; justify-content:center; }
+  .app-icon-mark{ width:32px; height:28px; background:#FFFFFF; clip-path:polygon(50% 0%, 100% 38%, 100% 100%, 0% 100%, 0% 38%); }
+  .icon-note{ font-size:13px; color:var(--sub); max-width:380px; line-height:1.5; }
+
+  /* Usage notes */
+  .notes{ font-size:14px; color:var(--ink); line-height:1.7; }
+  .notes div{ padding:10px 0; border-bottom:1px solid var(--line); }
+  .notes div:last-child{ border-bottom:none; }
+  .notes b{ font-weight:700; }
+
+  footer{ font-size:12px; color:var(--sub); padding-top:20px; }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="eyebrow">Coabi · Identità visiva — v2</div>
+
+  <div class="hero">
+    <div class="wordmark">
+      co<span class="a-mark"><span class="shape"></span></span>bi
+    </div>
+    <div class="tagline">Apri, e sai dove sei.</div>
+    <div class="signature-note">
+      <span class="mark"></span>
+      <span>La "a" di coabi è diventata una piccola casa corallo: l'unica forma del marchio che non è una lettera, ed è quella che dice di cosa si tratta.</span>
+    </div>
+  </div>
+
+  <section>
+    <div class="sec-label">Palette — su sfondo bianco</div>
+
+    <div class="pal-group">
+      <div class="pal-group-label">Base</div>
+      <div class="swatch-row">
+        <div class="swatch"><div class="fill" style="background:#FFFFFF; border-bottom:1px solid var(--line);"></div><div class="meta"><div class="role">Carta</div><div class="hex">#FFFFFF</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--ink);"></div><div class="meta"><div class="role">Inchiostro — testo</div><div class="hex">#1B201A</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--sub);"></div><div class="meta"><div class="role">Testo secondario</div><div class="hex">#6B7268</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--line);"></div><div class="meta"><div class="role">Linee, bordi</div><div class="hex">#E7E4D9</div></div></div>
+      </div>
+    </div>
+
+    <div class="pal-group">
+      <div class="pal-group-label">Marchio &amp; segnali — ogni colore ha un compito nel prodotto</div>
+      <div class="swatch-row">
+        <div class="swatch"><div class="fill" style="background:var(--sage);"></div><div class="meta"><div class="role">Salvia — marchio, azioni</div><div class="hex">#3A554C</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--sage-soft);"></div><div class="meta"><div class="role">Salvia tenue — in pari</div><div class="hex">#E4EDE7</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--coral);"></div><div class="meta"><div class="role">Corallo — devi</div><div class="hex">#CF5F49</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--coral-soft);"></div><div class="meta"><div class="role">Corallo tenue — promemoria</div><div class="hex">#F6E2DC</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--honey);"></div><div class="meta"><div class="role">Miele — stima</div><div class="hex">#CC8E2E</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--honey-soft);"></div><div class="meta"><div class="role">Miele tenue — in arrivo</div><div class="hex">#F4E8CF</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">Tipografia</div>
+
+    <div class="type-block">
+      <div class="type-role">Display — titoli, importi, il marchio</div>
+      <div class="type-name">Familjen Grotesk</div>
+      <div class="type-sample-display">Quanto devi, a colpo d'occhio</div>
+      <div class="weights"><span><b>700</b> Bold</span><span><b>500</b> Medium</span><span><b>400</b> Regular</span></div>
+      <div class="type-rationale">Stessa famiglia di sensazione di Bricolage — un grottesco caldo, con dettagli leggermente irregolari che lo rendono meno anonimo — ma con un carattere tutto suo, più squadrato e ordinato. Tiene bene il bianco "da tech" senza diventare freddo.</div>
+    </div>
+
+    <div class="type-block">
+      <div class="type-role">Testo — corpo, etichette, cifre</div>
+      <div class="type-name">Hanken Grotesque</div>
+      <div class="type-sample-body">Marco ha anticipato 36,40 € per la spesa. La tua quota è 12,13 €. <strong>0123456789</strong></div>
+      <div class="weights"><span><b>400</b> Regular</span><span><b>500</b> Medium</span><span><b>600</b> Semibold</span></div>
+      <div class="type-rationale">Cifre nitide e leggibili anche piccole — qui passano soldi, l'importo deve leggersi senza ambiguità al primo sguardo. Resta invariato rispetto alla v1.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">In contesto — il tono applicato</div>
+    <div class="chips">
+      <span class="chip sage">Sei in pari 🎉</span>
+      <span class="chip coral">Devi 12,40 € a Marco</span>
+      <span class="chip honey">Le bollette sono ancora una stima</span>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">Icona app — concept</div>
+    <div class="icon-row">
+      <div class="app-icon"><div class="app-icon-mark"></div></div>
+      <div class="icon-note">Stessa casa del marchio, in bianco su salvia piena: riconoscibile anche senza la parola "coabi" accanto, a 40px tra le altre icone del telefono.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">Uso del marchio</div>
+    <div class="notes">
+      <div><b>Colore:</b> salvia su bianco è la versione primaria. Non ricolorare il marchio con altri toni della palette.</div>
+      <div><b>Spazio:</b> lascia sempre intorno al marchio uno spazio libero pari almeno all'altezza della casa.</div>
+      <div><b>La casa:</b> resta sempre corallo, anche quando il resto del marchio cambia colore (es. su sfondo scuro, in negativo).</div>
+      <div><b>Stato:</b> concept v2 — proporzioni e bilanciamento ottico da rifinire in Figma prima della produzione finale.</div>
+    </div>
+  </section>
+
+  <footer>Coabi — documento di lavoro, giugno 2026.</footer>
+</div>
+</body>
+</html>
