@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { Eye, EyeOff } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { C, inputStyle, primaryBtn } from "@/lib/constants"
 import { Wordmark } from "@/components/Wordmark"
@@ -12,6 +13,7 @@ export default function SignupPage() {
   const [fullName, setFullName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -42,7 +44,6 @@ export default function SignupPage() {
     }
 
     if (!data.session) {
-      // Email confirmation required — mostra messaggio e non redirezionare
       setError("__confirm__")
       setLoading(false)
       return
@@ -82,16 +83,29 @@ export default function SignupPage() {
               style={inputStyle}
               autoComplete="email"
             />
-            <input
-              type="password"
-              placeholder="Password (min. 6 caratteri)"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-              style={inputStyle}
-              autoComplete="new-password"
-            />
+            <div style={{ position: "relative" }}>
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password (min. 6 caratteri)"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+                style={{ ...inputStyle, paddingRight: 46 }}
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                style={{
+                  position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)",
+                  background: "none", border: "none", cursor: "pointer", padding: 4,
+                  color: C.faint, display: "flex", alignItems: "center",
+                }}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
 
             {error === "__confirm__" ? (
               <div style={{ fontSize: 13.5, color: C.sageDeep, fontWeight: 500, padding: "12px 14px", background: C.sageSoft, borderRadius: 10, lineHeight: 1.5 }}>

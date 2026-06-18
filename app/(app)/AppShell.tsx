@@ -1,8 +1,9 @@
 "use client"
 
-import { createContext, useContext } from "react"
+import { createContext, useContext, useEffect } from "react"
 import type { Profile, House, MemberWithProfile } from "@/lib/types"
 import { BottomNav } from "@/components/BottomNav"
+import { createClient } from "@/lib/supabase/client"
 
 interface HouseContextValue {
   user: { id: string; email?: string }
@@ -28,6 +29,17 @@ interface AppShellProps {
 }
 
 export default function AppShell({ user, profile, house, currentMember, children }: AppShellProps) {
+  useEffect(() => {
+    const rm = localStorage.getItem("coabi_rm")
+    if (rm === "0" && !sessionStorage.getItem("coabi_ss")) {
+      createClient().auth.signOut().then(() => {
+        window.location.href = "/auth/login"
+      })
+    } else {
+      sessionStorage.setItem("coabi_ss", "1")
+    }
+  }, [])
+
   return (
     <HouseContext.Provider value={{ user, profile, house, currentMember }}>
       <div
