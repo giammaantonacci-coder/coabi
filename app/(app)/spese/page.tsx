@@ -55,25 +55,93 @@ function ExpRow({ e, members, last }: { e: Expense; members: MemberWithProfile[]
 function AddExpenseSheet({
   onClose,
   onSubmit,
+  members,
+  currentMemberId,
 }: {
   onClose: () => void
-  onSubmit: (desc: string, amount: number) => Promise<void>
+  onSubmit: (desc: string, amount: number, kind: "comune" | "personale", owedBy: string | null) => Promise<void>
+  members: MemberWithProfile[]
+  currentMemberId: string
 }) {
   const [desc, setDesc] = useState("")
   const [amt, setAmt] = useState("")
+  const [kind, setKind] = useState<"comune" | "personale">("comune")
+  const [owedBy, setOwedBy] = useState<string>("")
   const [loading, setLoading] = useState(false)
-  const ok = desc.trim().length > 0 && Number(amt) > 0
+
+  const others = members.filter((m) => m.id !== currentMemberId)
+
+  function handleKindChange(k: "comune" | "personale") {
+    setKind(k)
+    if (k === "personale" && others.length === 1) setOwedBy(others[0].id)
+    else if (k === "comune") setOwedBy("")
+  }
+
+  const ok =
+    desc.trim().length > 0 &&
+    Number(amt) > 0 &&
+    (kind === "comune" || owedBy !== "")
 
   async function handleSubmit() {
     if (!ok) return
     setLoading(true)
-    await onSubmit(desc.trim(), r2(Number(amt.replace(",", "."))))
+    await onSubmit(desc.trim(), r2(Number(amt.replace(",", "."))), kind, owedBy || null)
     setLoading(false)
   }
 
   return (
     <Backdrop onClose={onClose}>
-      <SheetHead title="Nuova spesa comune" onClose={onClose} />
+      <SheetHead title="Nuova spesa" onClose={onClose} />
+      <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+        {(["comune", "personale"] as const).map((k) => {
+          const on = kind === k
+          return (
+            <button
+              key={k}
+              onClick={() => handleKindChange(k)}
+              style={{
+                flex: 1, textAlign: "left", padding: "10px 14px", borderRadius: 13, cursor: "pointer",
+                background: on ? (k === "comune" ? C.sageSoft : C.honeySoft) : C.card,
+                border: `1.5px solid ${on ? (k === "comune" ? C.sage : C.honey) : C.line}`,
+              }}
+            >
+              <div style={{ fontWeight: 700, fontSize: 14 }}>{k === "comune" ? "Comune" : "Personale"}</div>
+              <div style={{ fontSize: 11.5, color: C.sub, marginTop: 1 }}>
+                {k === "comune" ? "divisa tra tutti" : "a carico di uno"}
+              </div>
+            </button>
+          )
+        })}
+      </div>
+
+      {kind === "personale" && others.length > 1 && (
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 12.5, color: C.sub, fontWeight: 700, margin: "0 2px 8px", letterSpacing: ".03em" }}>
+            A CARICO DI
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {others.map((m) => {
+              const on = owedBy === m.id
+              return (
+                <button
+                  key={m.id}
+                  onClick={() => setOwedBy(m.id)}
+                  style={{
+                    padding: "7px 14px", borderRadius: 99, cursor: "pointer",
+                    background: on ? C.honey : C.card,
+                    border: `1.5px solid ${on ? C.honey : C.line}`,
+                    color: on ? "#fff" : C.ink,
+                    fontWeight: 600, fontSize: 13.5,
+                  }}
+                >
+                  {m.profile.full_name}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       <input
         value={desc}
         onChange={(e) => setDesc(e.target.value)}
@@ -223,18 +291,24 @@ export default function SpesePage() {
   const youOwe = suggestions.filter((s) => s.from === currentMember.id)
   const oweYou = suggestions.filter((s) => s.to === currentMember.id)
 
-  async function handleAddExpense(desc: string, amount: number) {
+  async function handleAddExpense(
+    desc: string,
+    amount: number,
+    kind: "comune" | "personale",
+    owedBy: string | null
+  ) {
     const supabase = createClient()
     await supabase.from("expenses").insert({
       house_id: house.id,
-      kind: "comune",
+      kind,
       description: desc,
       amount,
       paid_by: currentMember.id,
+      owed_by: owedBy,
       source: "manuale",
     })
     setModal(null)
-    flash("Spesa aggiunta al comune")
+    flash(kind === "comune" ? "Spesa aggiunta al comune" : "Spesa personale registrata")
     await refresh()
   }
 
@@ -349,7 +423,12 @@ export default function SpesePage() {
       </div>
 
       {modal === "add" && (
-        <AddExpenseSheet onClose={() => setModal(null)} onSubmit={handleAddExpense} />
+        <AddExpenseSheet
+          onClose={() => setModal(null)}
+          onSubmit={handleAddExpense}
+          members={members}
+          currentMemberId={currentMember.id}
+        />
       )}
       {modal === "pay" && payTarget && (
         <PaySheet

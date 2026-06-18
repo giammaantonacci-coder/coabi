@@ -103,13 +103,75 @@ function InviteSheet({ inviteCode, onClose, onCopy }: { inviteCode: string; onCl
   )
 }
 
-function InfoSheet({ onClose }: { onClose: () => void }) {
+function InfoSheet({
+  house,
+  members,
+  onClose,
+}: {
+  house: { address: string; city: string | null; contract_start: string | null; contract_end: string | null }
+  members: MemberWithProfile[]
+  onClose: () => void
+}) {
+  const fmtDate = (d: string | null) =>
+    d ? new Date(d).toLocaleDateString("it-IT", { day: "numeric", month: "short", year: "numeric" }) : "—"
+
   return (
     <Backdrop onClose={onClose}>
       <SheetHead title="Info casa" onClose={onClose} />
-      <p style={{ fontSize: 14, color: C.sub, lineHeight: 1.5 }}>
-        Qui troverai le informazioni utili sulla tua casa — regole del condominio, numeri di emergenza e contatti dell'agenzia. Per ora questa sezione è in arrivo.
-      </p>
+
+      <div style={{ fontSize: 12.5, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase", margin: "4px 2px 8px" }}>
+        Indirizzo
+      </div>
+      <div style={{ background: C.sageSoft, borderRadius: 14, padding: "12px 16px", marginBottom: 18 }}>
+        <div style={{ fontWeight: 600, fontSize: 15 }}>{house.address}</div>
+        {house.city && <div style={{ fontSize: 13, color: C.sub, marginTop: 2 }}>{house.city}</div>}
+      </div>
+
+      <div style={{ fontSize: 12.5, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase", margin: "0 2px 8px" }}>
+        Contratto
+      </div>
+      <div style={{ background: C.sageSoft, borderRadius: 14, padding: "12px 16px", marginBottom: 18 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 8, borderBottom: `1px solid ${C.line}` }}>
+          <span style={{ fontSize: 13.5, color: C.sub }}>Inizio</span>
+          <span style={{ fontSize: 13.5, fontWeight: 600 }}>{fmtDate(house.contract_start)}</span>
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 8 }}>
+          <span style={{ fontSize: 13.5, color: C.sub }}>Scadenza</span>
+          <span style={{ fontSize: 13.5, fontWeight: 600 }}>{fmtDate(house.contract_end)}</span>
+        </div>
+      </div>
+
+      <div style={{ fontSize: 12.5, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase", margin: "0 2px 8px" }}>
+        Coinquilini
+      </div>
+      <div style={{ background: C.sageSoft, borderRadius: 14, overflow: "hidden" }}>
+        {members.map((m, i) => (
+          <div
+            key={m.id}
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              padding: "11px 16px",
+              borderBottom: i < members.length - 1 ? `1px solid ${C.line}` : "none",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{
+                width: 30, height: 30, borderRadius: 99,
+                background: m.profile.avatar_color, color: "#fff",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 11, fontWeight: 700,
+              }}>
+                {m.short}
+              </div>
+              <div>
+                <div style={{ fontWeight: 600, fontSize: 14 }}>{m.profile.full_name}</div>
+                <div style={{ fontSize: 12, color: C.sub }}>{m.room_label ?? "Stanza"}</div>
+              </div>
+            </div>
+            <span style={{ fontSize: 13.5, fontWeight: 600 }}>{eur(m.monthly_rent)}/mese</span>
+          </div>
+        ))}
+      </div>
     </Backdrop>
   )
 }
@@ -375,7 +437,7 @@ export default function CasaPage() {
           }}
         />
       )}
-      {modal === "info" && <InfoSheet onClose={() => setModal(null)} />}
+      {modal === "info" && <InfoSheet house={house} members={members} onClose={() => setModal(null)} />}
       {modal === "pay" && payTarget && (
         <PaySheet
           s={payTarget}

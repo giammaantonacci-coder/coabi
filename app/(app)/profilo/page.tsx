@@ -5,8 +5,9 @@ import { AlertTriangle, Lock } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { useHouse } from "@/app/(app)/AppShell"
-import { C, card } from "@/lib/constants"
+import { C, card, inputStyle, primaryBtn } from "@/lib/constants"
 import { eur, computeNet, settle, r2 } from "@/lib/finance"
+import { Backdrop, SheetHead } from "@/components/Sheet"
 import type { DepositContribution, Expense, MemberWithProfile, Settlement } from "@/lib/types"
 
 function initials(name: string) {
@@ -38,6 +39,53 @@ function MiniStat({ label, value, tone, sub }: { label: string; value: string; t
   )
 }
 
+function AddDepositSheet({
+  onClose,
+  onSubmit,
+}: {
+  onClose: () => void
+  onSubmit: (amount: number) => Promise<void>
+}) {
+  const [amt, setAmt] = useState("")
+  const [loading, setLoading] = useState(false)
+  const ok = Number(amt) > 0
+
+  async function handleSubmit() {
+    if (!ok) return
+    setLoading(true)
+    await onSubmit(r2(Number(amt.replace(",", "."))))
+    setLoading(false)
+  }
+
+  return (
+    <Backdrop onClose={onClose}>
+      <SheetHead title="Registra cauzione" onClose={onClose} />
+      <div style={{ fontSize: 13.5, color: C.sub, marginBottom: 16, lineHeight: 1.4 }}>
+        Inserisci la quota di cauzione che hai versato al proprietario.
+      </div>
+      <div style={{ position: "relative" }}>
+        <span style={{ position: "absolute", left: 16, top: 14, fontSize: 18, color: C.sub, fontWeight: 600 }}>€</span>
+        <input
+          value={amt}
+          onChange={(e) => setAmt(e.target.value.replace(",", "."))}
+          placeholder="0,00"
+          inputMode="decimal"
+          style={{ ...inputStyle, paddingLeft: 34, fontSize: 20, fontWeight: 700 }}
+          className="disp"
+          autoFocus
+        />
+      </div>
+      <button
+        disabled={!ok || loading}
+        onClick={handleSubmit}
+        style={{ ...primaryBtn, opacity: ok && !loading ? 1 : 0.4 }}
+      >
+        {loading ? "Salvataggio…" : "Salva cauzione"}
+      </button>
+    </Backdrop>
+  )
+}
+
 function Skeleton() {
   return (
     <div>
@@ -57,6 +105,7 @@ export default function ProfiloPage() {
   const [deposits, setDeposits] = useState<DepositContribution[]>([])
   const [loading, setLoading] = useState(true)
   const [loggingOut, setLoggingOut] = useState(false)
+  const [modal, setModal] = useState<"deposit" | null>(null)
 
   async function refresh() {
     const supabase = createClient()
@@ -116,6 +165,17 @@ export default function ProfiloPage() {
   const contractEnd = house.contract_end
     ? new Date(house.contract_end).toLocaleDateString("it-IT", { day: "numeric", month: "short", year: "numeric" })
     : "—"
+
+  async function handleAddDeposit(amount: number) {
+    const supabase = createClient()
+    await supabase.from("deposit_contributions").insert({
+      house_id: house.id,
+      member_id: currentMember.id,
+      amount,
+    })
+    setModal(null)
+    await refresh()
+  }
 
   async function handleLogout() {
     setLoggingOut(true)
@@ -201,17 +261,30 @@ export default function ProfiloPage() {
                 </span>
               </div>
 
-              {totalDeposit === 0 && (
-                <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${C.line}`, display: "flex", gap: 9, alignItems: "flex-start" }}>
-                  <AlertTriangle size={15} color={C.honey} style={{ marginTop: 2, flexShrink: 0 }} />
-                  <div>
-                    <div style={{ fontWeight: 600, fontSize: 14 }}>Nessuna cauzione registrata</div>
-                    <div style={{ fontSize: 12.5, color: C.sub, marginTop: 2 }}>
-                      Aggiungi la tua quota cauzione per tenerla sotto controllo.
+              <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${C.line}` }}>
+                {totalDeposit === 0 && (
+                  <div style={{ display: "flex", gap: 9, alignItems: "flex-start", marginBottom: 14 }}>
+                    <AlertTriangle size={15} color={C.honey} style={{ marginTop: 2, flexShrink: 0 }} />
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: 14 }}>Nessuna cauzione registrata</div>
+                      <div style={{ fontSize: 12.5, color: C.sub, marginTop: 2 }}>
+                        Aggiungi la tua quota cauzione per tenerla sotto controllo.
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
+                <button
+                  onClick={() => setModal("deposit")}
+                  style={{
+                    width: "100%", padding: "11px 0", borderRadius: 13,
+                    background: "none", color: C.sageDeep,
+                    border: `1px solid ${C.sage}`,
+                    fontSize: 14, fontWeight: 600, cursor: "pointer",
+                  }}
+                >
+                  {totalDeposit > 0 ? "Aggiungi versamento" : "Registra cauzione"}
+                </button>
+              </div>
             </div>
 
             <button
@@ -229,6 +302,13 @@ export default function ProfiloPage() {
           </>
         )}
       </div>
+
+      {modal === "deposit" && (
+        <AddDepositSheet
+          onClose={() => setModal(null)}
+          onSubmit={handleAddDeposit}
+        />
+      )}
     </div>
   )
 }
