@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Check, Plus, ShoppingBasket } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useHouse } from "@/app/(app)/AppShell"
-import { C, addPill, card, inputStyle, primaryBtn } from "@/lib/constants"
+import { C, addPill, card, fab, inputStyle, primaryBtn } from "@/lib/constants"
 import { r2 } from "@/lib/finance"
 import { Backdrop, SheetHead } from "@/components/Sheet"
 import type { MemberWithProfile, ShoppingItem } from "@/lib/types"
@@ -13,7 +13,7 @@ function initials(name: string) {
   return name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2)
 }
 
-const AVATAR_COLORS = ["#5C7E70", "#CF5F49", "#CC8E2E"]
+const AVATAR_COLORS = [C.sage, C.coral, C.honey]
 
 function AddItemSheet({
   onClose,
@@ -247,7 +247,7 @@ export default function SpesaPage() {
         <div style={{ fontSize: 12.5, color: C.sub, fontWeight: 600, letterSpacing: ".02em" }}>
           {house.city ?? house.address}
         </div>
-        <div className="disp" style={{ fontSize: 25, fontWeight: 700, marginTop: 4, color: "#1B201A" }}>
+        <div className="disp" style={{ fontSize: 25, fontWeight: 700, marginTop: 4, color: C.ink }}>
           Lista della spesa
         </div>
       </div>
@@ -260,13 +260,10 @@ export default function SpesaPage() {
           </span>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "22px 2px 10px" }}>
+        <div style={{ margin: "22px 2px 10px" }}>
           <span style={{ fontSize: 12.5, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase" }}>
             Serve in casa
           </span>
-          <button onClick={() => setModal("add")} style={addPill}>
-            <Plus size={15} /> Richiedi
-          </button>
         </div>
 
         {loading ? (
@@ -315,6 +312,10 @@ export default function SpesaPage() {
           </div>
         )}
       </div>
+
+      <button onClick={() => setModal("add")} style={fab} aria-label="Aggiungi alla lista">
+        <Plus size={24} />
+      </button>
 
       {modal === "add" && (
         <AddItemSheet onClose={() => setModal(null)} onSubmit={handleAddItem} />

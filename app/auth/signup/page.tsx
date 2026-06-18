@@ -52,13 +52,13 @@ export default function SignupPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F5F3EE", display: "flex", justifyContent: "center", alignItems: "center", padding: "24px 20px" }}>
+    <div style={{ minHeight: "100vh", background: "#FFFFFF", display: "flex", justifyContent: "center", alignItems: "center", padding: "24px 20px" }}>
       <div style={{ width: "100%", maxWidth: 400 }}>
         <div style={{ textAlign: "center", marginBottom: 36 }}>
           <Wordmark size={32} />
         </div>
 
-        <div style={{ background: "#fff", borderRadius: 24, padding: "32px 28px", border: `1px solid ${C.line}` }}>
+        <div style={{ background: "#fff", borderRadius: 24, padding: "32px 28px", boxShadow: "0 4px 24px rgba(0,0,0,.07), 0 1px 4px rgba(0,0,0,.04)" }}>
           <h1 className="disp" style={{ fontSize: 26, fontWeight: 700, color: C.ink, marginBottom: 24 }}>
             Crea il tuo account
           </h1>

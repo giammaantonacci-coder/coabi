@@ -319,7 +319,7 @@ export default function CasaPage() {
       <div style={{ padding: "20px 18px 14px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
           <Wordmark size={19} />
-          <div className="disp" style={{ fontSize: 25, fontWeight: 700, marginTop: 4, color: "#1B201A" }}>
+          <div className="disp" style={{ fontSize: 25, fontWeight: 700, marginTop: 4, color: C.ink }}>
             {house.address}
           </div>
         </div>

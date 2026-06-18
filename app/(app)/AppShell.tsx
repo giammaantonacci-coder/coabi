@@ -33,7 +33,7 @@ export default function AppShell({ user, profile, house, currentMember, children
       <div
         style={{
           minHeight: "100vh",
-          background: "#dcdacf",
+          background: "#FFFFFF",
           display: "flex",
           justifyContent: "center",
         }}

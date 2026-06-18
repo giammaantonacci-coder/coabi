@@ -68,7 +68,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F5F3EE", display: "flex", justifyContent: "center", alignItems: "flex-start", padding: "48px 20px 40px" }}>
+    <div style={{ minHeight: "100vh", background: "#FFFFFF", display: "flex", justifyContent: "center", alignItems: "flex-start", padding: "48px 20px 40px" }}>
       <div style={{ width: "100%", maxWidth: 400 }}>
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <Wordmark size={30} />
@@ -82,7 +82,7 @@ export default function OnboardingPage() {
           {modeBtn("entra", "Entra in una casa", "hai un codice invito")}
         </div>
 
-        <div style={{ background: "#fff", borderRadius: 24, padding: "28px 24px", border: `1px solid ${C.line}` }}>
+        <div style={{ background: "#fff", borderRadius: 24, padding: "28px 24px", boxShadow: "0 4px 24px rgba(0,0,0,.07), 0 1px 4px rgba(0,0,0,.04)" }}>
           {mode === "crea" ? (
             <form onSubmit={handleCrea} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <input

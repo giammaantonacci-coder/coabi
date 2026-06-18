@@ -14,7 +14,7 @@ function initials(name: string) {
   return name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2)
 }
 
-const AVATAR_COLORS = ["#5C7E70", "#CF5F49", "#CC8E2E"]
+const AVATAR_COLORS = [C.sage, C.coral, C.honey]
 
 function Row({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
   return (
@@ -190,7 +190,7 @@ export default function ProfiloPage() {
         <div style={{ fontSize: 12.5, color: C.sub, fontWeight: 600, letterSpacing: ".02em" }}>
           {house.city ?? house.address}
         </div>
-        <div className="disp" style={{ fontSize: 25, fontWeight: 700, marginTop: 4, color: "#1B201A" }}>
+        <div className="disp" style={{ fontSize: 25, fontWeight: 700, marginTop: 4, color: C.ink }}>
           Il tuo profilo
         </div>
       </div>
@@ -257,7 +257,7 @@ export default function ProfiloPage() {
               <div style={{ display: "flex", gap: 8, alignItems: "flex-start", marginTop: 10 }}>
                 <Lock size={14} color={C.sub} style={{ marginTop: 2, flexShrink: 0 }} />
                 <span style={{ fontSize: 12.5, color: C.sub }}>
-                  Torna per intero a fine contratto — non quando esci.
+                  Torna alla tua uscita, salvo trattenute per danni.
                 </span>
               </div>
 
