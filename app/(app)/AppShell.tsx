@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect } from "react"
 import type { Profile, House, MemberWithProfile } from "@/lib/types"
 import { BottomNav } from "@/components/BottomNav"
+import { SplashScreen } from "@/components/SplashScreen"
 import { createClient } from "@/lib/supabase/client"
 
 interface HouseContextValue {
@@ -61,6 +62,7 @@ export default function AppShell({ user, profile, house, currentMember, children
             boxShadow: "0 0 60px rgba(0,0,0,.18)",
           }}
         >
+          <SplashScreen />
           {children}
           <BottomNav />
         </div>

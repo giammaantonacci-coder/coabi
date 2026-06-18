@@ -1,0 +1,17 @@
+{
+  "name": "Coabi",
+  "short_name": "Coabi",
+  "description": "Tieni tutti i conti di casa sotto controllo",
+  "start_url": "/casa",
+  "display": "standalone",
+  "background_color": "#FF5A3C",
+  "theme_color": "#FF5A3C",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
