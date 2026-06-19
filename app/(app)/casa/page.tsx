@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useMemo } from "react"
-import { ArrowRight, Bell, Check, Info, Link2, Users, X } from "lucide-react"
+import { ArrowRight, Bell, Check, CheckCircle2, Info, Link2, Receipt, Users, X } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useHouse } from "@/app/(app)/AppShell"
 import { C, card, iconBtn, primaryBtn } from "@/lib/constants"
@@ -225,6 +225,106 @@ function PaySheet({
   )
 }
 
+function NotifSheet({
+  youOwe, oweYou, expenses, members, onClose, onPay,
+}: {
+  youOwe: SettleSuggestion[]
+  oweYou: SettleSuggestion[]
+  expenses: Expense[]
+  members: MemberWithProfile[]
+  onClose: () => void
+  onPay: (s: SettleSuggestion) => void
+}) {
+  const inPari = youOwe.length === 0 && oweYou.length === 0
+  const recent = expenses.slice(0, 5)
+
+  return (
+    <Backdrop onClose={onClose}>
+      <SheetHead title="Aggiornamenti" onClose={onClose} />
+
+      {inPari ? (
+        <div style={{ display: "flex", alignItems: "center", gap: 12, background: C.sageSoft, borderRadius: 16, padding: "14px 16px", marginBottom: 18 }}>
+          <CheckCircle2 size={22} color={C.sage} />
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 15, color: C.ink }}>Sei in pari</div>
+            <div style={{ fontSize: 13, color: C.sub, marginTop: 2 }}>Nessun conto aperto con la casa.</div>
+          </div>
+        </div>
+      ) : (
+        <>
+          {youOwe.length > 0 && (
+            <>
+              <div style={{ fontSize: 13, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase", margin: "0 2px 10px" }}>Da pagare</div>
+              <div style={{ ...card(0), marginBottom: 18, overflow: "hidden" }}>
+                {youOwe.map((s, i) => {
+                  const to = members.find((m) => m.id === s.to)
+                  return (
+                    <div key={"o" + i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", borderBottom: i < youOwe.length - 1 ? `1px solid ${C.line}` : "none" }}>
+                      <span style={{ fontSize: 14.5, display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ width: 8, height: 8, borderRadius: 99, background: to?.profile.avatar_color ?? C.coral, display: "inline-block" }} />
+                        {to?.profile.full_name ?? "coinquilino"}
+                      </span>
+                      <button onClick={() => onPay(s)} style={{ display: "flex", alignItems: "center", gap: 10, border: "none", background: "none", cursor: "pointer" }}>
+                        <b className="disp" style={{ fontSize: 15 }}>{eur(s.amount)}</b>
+                        <span style={{ background: C.sage, color: "#fff", fontSize: 13, fontWeight: 700, padding: "5px 12px", borderRadius: 99 }}>Salda</span>
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+            </>
+          )}
+          {oweYou.length > 0 && (
+            <>
+              <div style={{ fontSize: 13, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase", margin: "0 2px 10px" }}>Ti devono</div>
+              <div style={{ ...card(0), marginBottom: 18, overflow: "hidden" }}>
+                {oweYou.map((s, i) => {
+                  const from = members.find((m) => m.id === s.from)
+                  return (
+                    <div key={"y" + i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", borderBottom: i < oweYou.length - 1 ? `1px solid ${C.line}` : "none" }}>
+                      <span style={{ fontSize: 14.5, display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ width: 8, height: 8, borderRadius: 99, background: from?.profile.avatar_color ?? C.honey, display: "inline-block" }} />
+                        {from?.profile.full_name ?? "coinquilino"}
+                      </span>
+                      <b className="disp" style={{ fontSize: 15, color: C.sageDeep }}>{eur(s.amount)}</b>
+                    </div>
+                  )
+                })}
+              </div>
+            </>
+          )}
+        </>
+      )}
+
+      {recent.length > 0 && (
+        <>
+          <div style={{ fontSize: 13, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase", margin: "4px 2px 10px" }}>Ultimi movimenti</div>
+          <div style={{ ...card(0), overflow: "hidden" }}>
+            {recent.map((e, i) => {
+              const payer = members.find((m) => m.id === e.paid_by)
+              const date = new Date(e.created_at).toLocaleDateString("it-IT", { day: "numeric", month: "short" })
+              return (
+                <div key={e.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: i < recent.length - 1 ? `1px solid ${C.line}` : "none" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: 10, background: payer?.profile.avatar_color ?? C.sage, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, flexShrink: 0 }}>
+                      {payer?.short ?? "?"}
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: 14.5 }}>{e.description}</div>
+                      <div style={{ fontSize: 13, color: C.sub }}>{payer?.profile.full_name ?? "—"} · {date}</div>
+                    </div>
+                  </div>
+                  <div className="disp" style={{ fontWeight: 700, fontSize: 15 }}>{eur(e.amount)}</div>
+                </div>
+              )
+            })}
+          </div>
+        </>
+      )}
+    </Backdrop>
+  )
+}
+
 function Skeleton() {
   return (
     <div style={{ padding: "0 18px" }}>
@@ -259,7 +359,7 @@ export default function CasaPage() {
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [settlements, setSettlements] = useState<Settlement[]>([])
   const [loading, setLoading] = useState(true)
-  const [modal, setModal] = useState<"invite" | "info" | "pay" | null>(null)
+  const [modal, setModal] = useState<"invite" | "info" | "pay" | "notif" | null>(null)
   const [payTarget, setPayTarget] = useState<SettleSuggestion | null>(null)
   const [toast, setToast] = useState<string | null>(null)
 
@@ -348,9 +448,12 @@ export default function CasaPage() {
           <button onClick={() => setModal("invite")} aria-label="Invita coinquilino" style={iconBtn}>
             <Users size={19} color={C.sageDeep} />
           </button>
-          <div style={{ ...iconBtn, position: "relative", cursor: "default" }}>
+          <button onClick={() => setModal("notif")} aria-label="Notifiche" style={{ ...iconBtn, position: "relative" }}>
             <Bell size={18} color={C.sageDeep} />
-          </div>
+            {!loading && youOwe.length > 0 && (
+              <span style={{ position: "absolute", top: 7, right: 7, width: 8, height: 8, borderRadius: 99, background: C.coral, border: "1.5px solid #fff" }} />
+            )}
+          </button>
         </div>
       </div>
 
@@ -431,8 +534,12 @@ export default function CasaPage() {
             </div>
             <div style={card(0)}>
               {expenses.length === 0 ? (
-                <div style={{ padding: 20, textAlign: "center", color: C.sub, fontSize: 14 }}>
-                  Nessuna spesa ancora. Inizia tu!
+                <div style={{ padding: "28px 20px", textAlign: "center" }}>
+                  <div style={{ width: 48, height: 48, borderRadius: 15, background: C.sageSoft, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
+                    <Receipt size={22} color={C.sage} />
+                  </div>
+                  <div className="disp" style={{ fontSize: 17, fontWeight: 700, color: C.ink, marginBottom: 5 }}>Nessuna spesa ancora</div>
+                  <div style={{ fontSize: 14, color: C.sub, lineHeight: 1.5 }}>Aggiungi la prima spesa dalla tab <b style={{ color: C.ink }}>Spese</b>.</div>
                 </div>
               ) : (
                 expenses.slice(0, 3).map((e, i) => (
@@ -462,6 +569,16 @@ export default function CasaPage() {
           members={members}
           onClose={() => { setModal(null); setPayTarget(null) }}
           onPaid={() => handleMarkPaid(payTarget)}
+        />
+      )}
+      {modal === "notif" && (
+        <NotifSheet
+          youOwe={youOwe}
+          oweYou={oweYou}
+          expenses={expenses}
+          members={members}
+          onClose={() => setModal(null)}
+          onPay={(s) => { setPayTarget(s); setModal("pay") }}
         />
       )}
 

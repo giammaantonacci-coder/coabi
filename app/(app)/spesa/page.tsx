@@ -274,8 +274,12 @@ export default function SpesaPage() {
         {loading ? (
           <Skeleton />
         ) : items.length === 0 ? (
-          <div style={{ ...card(), textAlign: "center", color: C.sub }}>
-            Lista vuota. Niente da comprare 👍
+          <div style={{ ...card(), textAlign: "center", padding: "32px 20px" }}>
+            <div style={{ width: 52, height: 52, borderRadius: 18, background: C.sageSoft, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
+              <ShoppingBasket size={26} color={C.sage} />
+            </div>
+            <div className="disp" style={{ fontSize: 18, fontWeight: 700, color: C.ink, marginBottom: 6 }}>Lista vuota</div>
+            <div style={{ fontSize: 14, color: C.sub, lineHeight: 1.5 }}>Usa il + per aggiungere quello che serve in casa.</div>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

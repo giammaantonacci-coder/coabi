@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useMemo } from "react"
-import { ArrowRight, Check } from "lucide-react"
+import { ArrowRight, Check, CheckCircle2, Receipt } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useHouse } from "@/app/(app)/AppShell"
 import { C, card, inputStyle, primaryBtn } from "@/lib/constants"
@@ -399,8 +399,14 @@ export default function SpesePage() {
                 </div>
               </>
             ) : (
-              <div style={{ ...card(), textAlign: "center", color: C.sub, marginTop: 4 }}>
-                Tutti in pari. Niente conti aperti ✦
+              <div style={{ ...card(), display: "flex", alignItems: "center", gap: 14, marginTop: 4 }}>
+                <div style={{ width: 48, height: 48, borderRadius: 15, background: C.sageSoft, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <CheckCircle2 size={24} color={C.sage} />
+                </div>
+                <div>
+                  <div className="disp" style={{ fontSize: 17, fontWeight: 700, color: C.ink }}>Tutti in pari</div>
+                  <div style={{ fontSize: 13, color: C.sub, marginTop: 2 }}>Nessun conto aperto tra coinquilini.</div>
+                </div>
               </div>
             )}
 
@@ -411,8 +417,12 @@ export default function SpesePage() {
             </div>
             <div style={card(0)}>
               {expenses.length === 0 ? (
-                <div style={{ padding: 20, textAlign: "center", color: C.sub, fontSize: 14 }}>
-                  Nessuna spesa ancora.
+                <div style={{ padding: "28px 20px", textAlign: "center" }}>
+                  <div style={{ width: 48, height: 48, borderRadius: 15, background: C.sageSoft, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
+                    <Receipt size={22} color={C.sage} />
+                  </div>
+                  <div className="disp" style={{ fontSize: 17, fontWeight: 700, color: C.ink, marginBottom: 5 }}>Nessun movimento</div>
+                  <div style={{ fontSize: 14, color: C.sub, lineHeight: 1.5 }}>Usa il + per aggiungere la prima spesa.</div>
                 </div>
               ) : (
                 expenses.map((e, i) => (
