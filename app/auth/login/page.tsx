@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Check, Eye, EyeOff } from "lucide-react"
@@ -10,6 +10,9 @@ import { Wordmark } from "@/components/Wordmark"
 
 export default function LoginPage() {
   const router = useRouter()
+
+  useEffect(() => { router.prefetch("/casa") }, [router])
+
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)

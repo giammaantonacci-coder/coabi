@@ -1,10 +1,10 @@
 "use client"
 
 import { useEffect, useState, useMemo } from "react"
-import { ArrowRight, Check, Plus } from "lucide-react"
+import { ArrowRight, Check } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useHouse } from "@/app/(app)/AppShell"
-import { C, card, fab, inputStyle, primaryBtn } from "@/lib/constants"
+import { C, card, inputStyle, primaryBtn } from "@/lib/constants"
 import { eur, r2, computeNet, settle } from "@/lib/finance"
 import { Backdrop, SheetHead } from "@/components/Sheet"
 import type { Expense, MemberWithProfile, Settlement, SettleSuggestion } from "@/lib/types"
@@ -31,13 +31,13 @@ function ExpRow({ e, members, last }: { e: Expense; members: MemberWithProfile[]
           width: 34, height: 34, borderRadius: 11,
           background: payer?.profile.avatar_color ?? C.sage,
           color: "#fff", display: "flex", alignItems: "center",
-          justifyContent: "center", fontSize: 12, fontWeight: 700,
+          justifyContent: "center", fontSize: 13, fontWeight: 700,
         }}>
           {payer?.short ?? "?"}
         </div>
         <div>
           <div style={{ fontWeight: 600, fontSize: 14.5 }}>{e.description}</div>
-          <div style={{ fontSize: 12, color: C.sub, marginTop: 1 }}>
+          <div style={{ fontSize: 13, color: C.sub, marginTop: 1 }}>
             {payer?.profile.full_name ?? "—"} · {date} ·{" "}
             {e.kind === "personale" && owedTo ? (
               <span style={{ color: C.honey, fontWeight: 600 }}>a carico di {owedTo.profile.full_name}</span>
@@ -106,7 +106,7 @@ function AddExpenseSheet({
               }}
             >
               <div style={{ fontWeight: 700, fontSize: 14 }}>{k === "comune" ? "Comune" : "Personale"}</div>
-              <div style={{ fontSize: 11.5, color: C.sub, marginTop: 1 }}>
+              <div style={{ fontSize: 13, color: C.sub, marginTop: 1 }}>
                 {k === "comune" ? "divisa tra tutti" : "a carico di uno"}
               </div>
             </button>
@@ -116,7 +116,7 @@ function AddExpenseSheet({
 
       {kind === "personale" && others.length > 1 && (
         <div style={{ marginBottom: 14 }}>
-          <div style={{ fontSize: 12.5, color: C.sub, fontWeight: 700, margin: "0 2px 8px", letterSpacing: ".03em" }}>
+          <div style={{ fontSize: 13, color: C.sub, fontWeight: 700, margin: "0 2px 8px", letterSpacing: ".03em" }}>
             A CARICO DI
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -283,7 +283,12 @@ export default function SpesePage() {
     setLoading(false)
   }
 
-  useEffect(() => { refresh() }, [])
+  useEffect(() => {
+    refresh()
+    const handler = () => setModal("add")
+    window.addEventListener("coabi-fab", handler)
+    return () => window.removeEventListener("coabi-fab", handler)
+  }, [])
 
   const memberIds = members.map((m) => m.id)
   const net = useMemo(() => computeNet(memberIds, expenses, settlements), [memberIds, expenses, settlements])
@@ -330,7 +335,7 @@ export default function SpesePage() {
   return (
     <div>
       <div style={{ padding: "20px 18px 14px" }}>
-        <div style={{ fontSize: 12.5, color: C.sub, fontWeight: 600, letterSpacing: ".02em" }}>
+        <div style={{ fontSize: 13, color: C.sub, fontWeight: 600, letterSpacing: ".02em" }}>
           {house.city ?? house.address}
         </div>
         <div className="disp" style={{ fontSize: 25, fontWeight: 700, marginTop: 4, color: C.ink }}>
@@ -345,7 +350,7 @@ export default function SpesePage() {
           <>
             {(youOwe.length > 0 || oweYou.length > 0) ? (
               <>
-                <div style={{ fontSize: 12.5, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase", margin: "4px 2px 10px" }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase", margin: "4px 2px 10px" }}>
                   Chi deve a chi
                 </div>
                 <div style={card()}>
@@ -367,7 +372,7 @@ export default function SpesePage() {
                         </span>
                         <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
                           <b style={{ fontSize: 15 }}>{eur(s.amount)}</b>
-                          <span style={{ background: C.sage, color: "#fff", fontSize: 12, fontWeight: 700, padding: "5px 12px", borderRadius: 99 }}>Salda</span>
+                          <span style={{ background: C.sage, color: "#fff", fontSize: 13, fontWeight: 700, padding: "5px 12px", borderRadius: 99 }}>Salda</span>
                         </span>
                       </div>
                     )
@@ -400,7 +405,7 @@ export default function SpesePage() {
             )}
 
             <div style={{ margin: "22px 2px 10px" }}>
-              <span style={{ fontSize: 12.5, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase" }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase" }}>
                 Movimenti
               </span>
             </div>
@@ -418,10 +423,6 @@ export default function SpesePage() {
           </>
         )}
       </div>
-
-      <button onClick={() => setModal("add")} style={fab} aria-label="Aggiungi spesa">
-        <Plus size={24} />
-      </button>
 
       {modal === "add" && (
         <AddExpenseSheet

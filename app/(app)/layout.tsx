@@ -20,12 +20,6 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   if (!user) redirect("/auth/login")
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single()
-
   const { data: memberData } = await supabase
     .from("house_members")
     .select("*, houses(*), profiles!user_id(*)")
@@ -35,7 +29,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   if (!memberData) redirect("/onboarding")
 
-  const profileData = profile ?? memberData.profiles
+  const profileData = memberData.profiles
 
   const currentMember: MemberWithProfile = {
     ...memberData,

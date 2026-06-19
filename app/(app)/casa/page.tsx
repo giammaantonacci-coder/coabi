@@ -57,13 +57,13 @@ function ExpRow({ e, members, last }: { e: Expense; members: MemberWithProfile[]
           width: 34, height: 34, borderRadius: 11,
           background: payer?.profile.avatar_color ?? C.sage,
           color: "#fff", display: "flex", alignItems: "center",
-          justifyContent: "center", fontSize: 12, fontWeight: 700,
+          justifyContent: "center", fontSize: 13, fontWeight: 700,
         }}>
           {payer?.short ?? "?"}
         </div>
         <div>
           <div style={{ fontWeight: 600, fontSize: 14.5 }}>{e.description}</div>
-          <div style={{ fontSize: 12, color: C.sub, marginTop: 1 }}>
+          <div style={{ fontSize: 13, color: C.sub, marginTop: 1 }}>
             {payer?.profile.full_name ?? "—"} · {date} ·{" "}
             {e.kind === "personale" && owedTo ? (
               <span style={{ color: C.honey, fontWeight: 600 }}>a carico di {owedTo.profile.full_name}</span>
@@ -91,7 +91,7 @@ function InviteSheet({ inviteCode, onClose, onCopy }: { inviteCode: string; onCl
         display: "flex", justifyContent: "space-between", alignItems: "center",
       }}>
         <div>
-          <div style={{ fontSize: 11.5, color: C.sub, fontWeight: 700, letterSpacing: ".04em" }}>CODICE CASA</div>
+          <div style={{ fontSize: 13, color: C.sub, fontWeight: 700, letterSpacing: ".04em" }}>CODICE CASA</div>
           <div className="disp" style={{ fontSize: 28, fontWeight: 700, letterSpacing: ".06em" }}>
             {inviteCode.toUpperCase()}
           </div>
@@ -119,7 +119,7 @@ function InfoSheet({
     <Backdrop onClose={onClose}>
       <SheetHead title="Info casa" onClose={onClose} />
 
-      <div style={{ fontSize: 12.5, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase", margin: "4px 2px 8px" }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase", margin: "4px 2px 8px" }}>
         Indirizzo
       </div>
       <div style={{ background: C.sageSoft, borderRadius: 14, padding: "12px 16px", marginBottom: 18 }}>
@@ -127,7 +127,7 @@ function InfoSheet({
         {house.city && <div style={{ fontSize: 13, color: C.sub, marginTop: 2 }}>{house.city}</div>}
       </div>
 
-      <div style={{ fontSize: 12.5, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase", margin: "0 2px 8px" }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase", margin: "0 2px 8px" }}>
         Contratto
       </div>
       <div style={{ background: C.sageSoft, borderRadius: 14, padding: "12px 16px", marginBottom: 18 }}>
@@ -141,7 +141,7 @@ function InfoSheet({
         </div>
       </div>
 
-      <div style={{ fontSize: 12.5, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase", margin: "0 2px 8px" }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase", margin: "0 2px 8px" }}>
         Coinquilini
       </div>
       <div style={{ background: C.sageSoft, borderRadius: 14, overflow: "hidden" }}>
@@ -159,13 +159,13 @@ function InfoSheet({
                 width: 30, height: 30, borderRadius: 99,
                 background: m.profile.avatar_color, color: "#fff",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 11, fontWeight: 700,
+                fontSize: 13, fontWeight: 700,
               }}>
                 {m.short}
               </div>
               <div>
                 <div style={{ fontWeight: 600, fontSize: 14 }}>{m.profile.full_name}</div>
-                <div style={{ fontSize: 12, color: C.sub }}>{m.room_label ?? "Stanza"}</div>
+                <div style={{ fontSize: 13, color: C.sub }}>{m.room_label ?? "Stanza"}</div>
               </div>
             </div>
             <span style={{ fontSize: 13.5, fontWeight: 600 }}>{eur(m.monthly_rent)}/mese</span>
@@ -228,9 +228,27 @@ function PaySheet({
 function Skeleton() {
   return (
     <div style={{ padding: "0 18px" }}>
-      {[1, 2, 3].map((i) => (
-        <div key={i} style={{ height: 60, borderRadius: 16, background: C.sageSoft, marginBottom: 12, opacity: 0.5 + i * 0.1 }} />
-      ))}
+      <div style={{ height: 164, borderRadius: 26, background: C.sageSoft, marginBottom: 22, opacity: 0.45 }} />
+      <div style={{ height: 13, width: 110, borderRadius: 7, background: C.sageSoft, marginBottom: 10, opacity: 0.35 }} />
+      <div style={{ ...card(0), overflow: "hidden" }}>
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            style={{
+              display: "flex", alignItems: "center", gap: 12,
+              padding: "14px 16px",
+              borderBottom: i < 3 ? `1px solid ${C.line}` : "none",
+            }}
+          >
+            <div style={{ width: 34, height: 34, borderRadius: 11, background: C.sageSoft, opacity: 0.5, flexShrink: 0 }} />
+            <div style={{ flex: 1 }}>
+              <div style={{ height: 13, width: "55%", borderRadius: 6, background: C.sageSoft, opacity: 0.5, marginBottom: 7 }} />
+              <div style={{ height: 10, width: "38%", borderRadius: 5, background: C.sageSoft, opacity: 0.35 }} />
+            </div>
+            <div style={{ height: 13, width: 48, borderRadius: 6, background: C.sageSoft, opacity: 0.45 }} />
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -344,11 +362,11 @@ export default function CasaPage() {
             {/* Hero */}
             <div style={{ background: C.sageDeep, borderRadius: 26, padding: "22px 22px 18px", color: "#fff", marginTop: 4 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: 12.5, opacity: .8, fontWeight: 600, letterSpacing: ".03em" }}>LA TUA POSIZIONE</span>
+                <span style={{ fontSize: 13, opacity: .8, fontWeight: 600, letterSpacing: ".03em" }}>LA TUA SITUAZIONE</span>
                 <AvatarStack members={members} size={26} />
               </div>
               <div className="disp" style={{ fontSize: 33, fontWeight: 700, marginTop: 12, lineHeight: 1.05 }}>
-                {inPari ? "Sei in pari 🎉" : youNet < 0 ? `Devi ${eur(Math.abs(youNet))}` : `Ti spettano ${eur(youNet)}`}
+                {inPari ? "Sei in pari" : youNet < 0 ? `Devi ${eur(Math.abs(youNet))}` : `Ti spettano ${eur(youNet)}`}
               </div>
               <div style={{ fontSize: 13.5, opacity: .85, marginTop: 6 }}>
                 {inPari
@@ -378,7 +396,7 @@ export default function CasaPage() {
                         </span>
                         <span style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 700 }}>
                           {eur(s.amount)}
-                          <span style={{ background: "#fff", color: C.sageDeep, fontSize: 11.5, fontWeight: 700, padding: "3px 9px", borderRadius: 99 }}>
+                          <span style={{ background: "#fff", color: C.sageDeep, fontSize: 13, fontWeight: 700, padding: "3px 9px", borderRadius: 99 }}>
                             Salda
                           </span>
                         </span>
@@ -408,7 +426,7 @@ export default function CasaPage() {
             </div>
 
             {/* Ultimi movimenti */}
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase", margin: "22px 2px 10px" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase", margin: "22px 2px 10px" }}>
               Ultimi movimenti
             </div>
             <div style={card(0)}>

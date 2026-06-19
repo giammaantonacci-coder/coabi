@@ -1,10 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Check, Plus, ShoppingBasket } from "lucide-react"
+import { Check, ShoppingBasket } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useHouse } from "@/app/(app)/AppShell"
-import { C, addPill, card, fab, inputStyle, primaryBtn } from "@/lib/constants"
+import { C, addPill, card, inputStyle, primaryBtn } from "@/lib/constants"
 import { r2 } from "@/lib/finance"
 import { Backdrop, SheetHead } from "@/components/Sheet"
 import type { MemberWithProfile, ShoppingItem } from "@/lib/types"
@@ -48,7 +48,7 @@ function AddItemSheet({
         style={inputStyle}
         autoFocus
       />
-      <div style={{ fontSize: 12.5, color: C.sub, fontWeight: 700, margin: "16px 2px 8px", letterSpacing: ".03em" }}>
+      <div style={{ fontSize: 13, color: C.sub, fontWeight: 700, margin: "16px 2px 8px", letterSpacing: ".03em" }}>
         CHI LA PAGA?
       </div>
       <div style={{ display: "flex", gap: 10 }}>
@@ -65,7 +65,7 @@ function AddItemSheet({
               }}
             >
               <div style={{ fontWeight: 700, fontSize: 14.5 }}>{o.label}</div>
-              <div style={{ fontSize: 12, color: C.sub, marginTop: 1 }}>{o.sub}</div>
+              <div style={{ fontSize: 13, color: C.sub, marginTop: 1 }}>{o.sub}</div>
             </button>
           )
         })}
@@ -119,7 +119,7 @@ function BoughtSheet({
           autoFocus
         />
       </div>
-      <div style={{ fontSize: 12.5, color: item.tag === "comune" ? C.sageDeep : C.honey, marginTop: 10, fontWeight: 600 }}>
+      <div style={{ fontSize: 13, color: item.tag === "comune" ? C.sageDeep : C.honey, marginTop: 10, fontWeight: 600 }}>
         {item.tag === "comune"
           ? "Verrà diviso tra tutti i coinquilini"
           : `Verrà messo a carico di ${requester?.profile.full_name ?? "chi l'ha chiesto"}`}
@@ -193,7 +193,12 @@ export default function SpesaPage() {
     setLoading(false)
   }
 
-  useEffect(() => { refresh() }, [])
+  useEffect(() => {
+    refresh()
+    const handler = () => setModal("add")
+    window.addEventListener("coabi-fab", handler)
+    return () => window.removeEventListener("coabi-fab", handler)
+  }, [])
 
   async function handleAddItem(item: string, tag: "comune" | "personale") {
     const supabase = createClient()
@@ -244,7 +249,7 @@ export default function SpesaPage() {
   return (
     <div>
       <div style={{ padding: "20px 18px 14px" }}>
-        <div style={{ fontSize: 12.5, color: C.sub, fontWeight: 600, letterSpacing: ".02em" }}>
+        <div style={{ fontSize: 13, color: C.sub, fontWeight: 600, letterSpacing: ".02em" }}>
           {house.city ?? house.address}
         </div>
         <div className="disp" style={{ fontSize: 25, fontWeight: 700, marginTop: 4, color: C.ink }}>
@@ -261,7 +266,7 @@ export default function SpesaPage() {
         </div>
 
         <div style={{ margin: "22px 2px 10px" }}>
-          <span style={{ fontSize: 12.5, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase" }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase" }}>
             Serve in casa
           </span>
         </div>
@@ -292,7 +297,7 @@ export default function SpesaPage() {
                     </div>
                     <div>
                       <div style={{ fontWeight: 600, fontSize: 15 }}>{it.item}</div>
-                      <div style={{ fontSize: 12, color: C.sub, marginTop: 1 }}>
+                      <div style={{ fontSize: 13, color: C.sub, marginTop: 1 }}>
                         <span style={{ color: it.tag === "comune" ? C.sageDeep : C.honey, fontWeight: 600 }}>
                           {it.tag}
                         </span>{" "}
@@ -304,7 +309,7 @@ export default function SpesaPage() {
                     onClick={() => { setBoughtTarget(it); setModal("bought") }}
                     style={{ ...addPill, background: C.sage, color: "#fff", border: "none" }}
                   >
-                    <Check size={15} /> L'ho preso
+                    <Check size={15} /> Preso
                   </button>
                 </div>
               )
@@ -312,10 +317,6 @@ export default function SpesaPage() {
           </div>
         )}
       </div>
-
-      <button onClick={() => setModal("add")} style={fab} aria-label="Aggiungi alla lista">
-        <Plus size={24} />
-      </button>
 
       {modal === "add" && (
         <AddItemSheet onClose={() => setModal(null)} onSubmit={handleAddItem} />

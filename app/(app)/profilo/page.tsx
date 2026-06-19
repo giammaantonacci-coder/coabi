@@ -32,9 +32,9 @@ function MiniStat({ label, value, tone, sub }: { label: string; value: string; t
   const fg = tone === "sage" ? C.sageDeep : C.honey
   return (
     <div style={{ flex: 1, background: bg, borderRadius: 15, padding: "12px 14px" }}>
-      <div style={{ fontSize: 11.5, fontWeight: 700, color: fg, letterSpacing: ".02em", textTransform: "uppercase" }}>{label}</div>
+      <div style={{ fontSize: 13, fontWeight: 700, color: fg, letterSpacing: ".02em", textTransform: "uppercase" }}>{label}</div>
       <div className="disp" style={{ fontSize: 22, fontWeight: 700, color: C.ink, marginTop: 3 }}>{value}</div>
-      {sub && <div style={{ fontSize: 11, color: C.sub, marginTop: 2 }}>{sub}</div>}
+      {sub && <div style={{ fontSize: 13, color: C.sub, marginTop: 2 }}>{sub}</div>}
     </div>
   )
 }
@@ -187,7 +187,7 @@ export default function ProfiloPage() {
   return (
     <div>
       <div style={{ padding: "20px 18px 14px" }}>
-        <div style={{ fontSize: 12.5, color: C.sub, fontWeight: 600, letterSpacing: ".02em" }}>
+        <div style={{ fontSize: 13, color: C.sub, fontWeight: 600, letterSpacing: ".02em" }}>
           {house.city ?? house.address}
         </div>
         <div className="disp" style={{ fontSize: 25, fontWeight: 700, marginTop: 4, color: C.ink }}>
@@ -217,7 +217,7 @@ export default function ProfiloPage() {
               </div>
             </div>
 
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase", margin: "22px 2px 10px" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase", margin: "22px 2px 10px" }}>
               Le tue voci fisse
             </div>
             <div style={card()}>
@@ -230,7 +230,7 @@ export default function ProfiloPage() {
               />
             </div>
 
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase", margin: "22px 2px 10px" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: C.sub, letterSpacing: ".04em", textTransform: "uppercase", margin: "22px 2px 10px" }}>
               Alla tua uscita
             </div>
             <div style={card()}>
@@ -256,7 +256,7 @@ export default function ProfiloPage() {
 
               <div style={{ display: "flex", gap: 8, alignItems: "flex-start", marginTop: 10 }}>
                 <Lock size={14} color={C.sub} style={{ marginTop: 2, flexShrink: 0 }} />
-                <span style={{ fontSize: 12.5, color: C.sub }}>
+                <span style={{ fontSize: 13, color: C.sub }}>
                   Torna alla tua uscita, salvo trattenute per danni.
                 </span>
               </div>
@@ -267,7 +267,7 @@ export default function ProfiloPage() {
                     <AlertTriangle size={15} color={C.honey} style={{ marginTop: 2, flexShrink: 0 }} />
                     <div>
                       <div style={{ fontWeight: 600, fontSize: 14 }}>Nessuna cauzione registrata</div>
-                      <div style={{ fontSize: 12.5, color: C.sub, marginTop: 2 }}>
+                      <div style={{ fontSize: 13, color: C.sub, marginTop: 2 }}>
                         Aggiungi la tua quota cauzione per tenerla sotto controllo.
                       </div>
                     </div>
