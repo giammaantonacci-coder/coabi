@@ -1,10 +1,10 @@
 "use client"
 
 import { useEffect, useState, useMemo } from "react"
-import { ArrowRight, Check, CheckCircle2, Receipt } from "lucide-react"
+import { ArrowRight, Check, CheckCircle2, Plus, Receipt } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useHouse } from "@/app/(app)/AppShell"
-import { C, card, inputStyle, primaryBtn } from "@/lib/constants"
+import { C, card, fab, inputStyle, primaryBtn } from "@/lib/constants"
 import { eur, r2, computeNet, settle } from "@/lib/finance"
 import { Backdrop, SheetHead } from "@/components/Sheet"
 import type { Expense, MemberWithProfile, Settlement, SettleSuggestion } from "@/lib/types"
@@ -283,12 +283,7 @@ export default function SpesePage() {
     setLoading(false)
   }
 
-  useEffect(() => {
-    refresh()
-    const handler = () => setModal("add")
-    window.addEventListener("coabi-fab", handler)
-    return () => window.removeEventListener("coabi-fab", handler)
-  }, [])
+  useEffect(() => { refresh() }, [])
 
   const memberIds = members.map((m) => m.id)
   const net = useMemo(() => computeNet(memberIds, expenses, settlements), [memberIds, expenses, settlements])
@@ -433,6 +428,10 @@ export default function SpesePage() {
           </>
         )}
       </div>
+
+      <button onClick={() => setModal("add")} style={fab} aria-label="Aggiungi spesa">
+        <Plus size={24} />
+      </button>
 
       {modal === "add" && (
         <AddExpenseSheet

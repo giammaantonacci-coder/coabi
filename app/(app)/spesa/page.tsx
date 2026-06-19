@@ -1,10 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Check, ShoppingBasket } from "lucide-react"
+import { Check, Plus, ShoppingBasket } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useHouse } from "@/app/(app)/AppShell"
-import { C, addPill, card, inputStyle, primaryBtn } from "@/lib/constants"
+import { C, addPill, card, fab, inputStyle, primaryBtn } from "@/lib/constants"
 import { r2 } from "@/lib/finance"
 import { Backdrop, SheetHead } from "@/components/Sheet"
 import type { MemberWithProfile, ShoppingItem } from "@/lib/types"
@@ -193,12 +193,7 @@ export default function SpesaPage() {
     setLoading(false)
   }
 
-  useEffect(() => {
-    refresh()
-    const handler = () => setModal("add")
-    window.addEventListener("coabi-fab", handler)
-    return () => window.removeEventListener("coabi-fab", handler)
-  }, [])
+  useEffect(() => { refresh() }, [])
 
   async function handleAddItem(item: string, tag: "comune" | "personale") {
     const supabase = createClient()
@@ -321,6 +316,10 @@ export default function SpesaPage() {
           </div>
         )}
       </div>
+
+      <button onClick={() => setModal("add")} style={fab} aria-label="Aggiungi alla lista">
+        <Plus size={24} />
+      </button>
 
       {modal === "add" && (
         <AddItemSheet onClose={() => setModal(null)} onSubmit={handleAddItem} />

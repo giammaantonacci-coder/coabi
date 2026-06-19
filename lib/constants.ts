@@ -35,7 +35,7 @@ export const addPill: React.CSSProperties = {
 }
 
 export const fab: React.CSSProperties = {
-  position: "fixed", bottom: 90, right: 24,
+  position: "fixed", bottom: "calc(env(safe-area-inset-bottom) + 92px)", right: 20,
   width: 54, height: 54, borderRadius: 18,
   background: "#FF5A3C", color: "#fff", border: "none",
   display: "flex", alignItems: "center", justifyContent: "center",
