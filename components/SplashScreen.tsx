@@ -54,7 +54,8 @@ export function SplashScreen() {
           xmlns="http://www.w3.org/2000/svg"
           style={{ width: "100%", height: "100%", display: "block" }}
         >
-          <polygon points="50,0 100,34 100,89 0,89 0,34" />
+          {/* House shape: rounded peak, sharp roof-wall junctions, rounded bottom corners */}
+          <path d="M 45 3 Q 50 0 55 3 L 100 34 L 100 75 Q 100 89 86 89 L 14 89 Q 0 89 0 75 L 0 34 Z" />
         </svg>
       </div>
     </div>

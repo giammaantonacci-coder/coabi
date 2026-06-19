@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useState, useMemo } from "react"
-import { AlertTriangle, Lock } from "lucide-react"
+import { useEffect, useState, useMemo, useRef } from "react"
+import { AlertTriangle, Camera, Lock } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { useHouse } from "@/app/(app)/AppShell"
@@ -99,6 +99,8 @@ function Skeleton() {
 export default function ProfiloPage() {
   const { currentMember, house, profile } = useHouse()
   const router = useRouter()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   const [members, setMembers] = useState<MemberWithProfile[]>([])
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [settlements, setSettlements] = useState<Settlement[]>([])
@@ -106,33 +108,22 @@ export default function ProfiloPage() {
   const [loading, setLoading] = useState(true)
   const [loggingOut, setLoggingOut] = useState(false)
   const [modal, setModal] = useState<"deposit" | null>(null)
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(profile.avatar_url ?? null)
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
 
   async function refresh() {
     const supabase = createClient()
 
-    const { data: membersRaw } = await supabase
-      .from("house_members")
-      .select("*, profiles!user_id(*)")
-      .eq("house_id", house.id)
-      .is("left_at", null)
+    const [membersRes, expensesRes, settlementsRes, depositsRes] = await Promise.all([
+      supabase.from("house_members").select("*, profiles!user_id(*)").eq("house_id", house.id).is("left_at", null),
+      supabase.from("expenses").select("*").eq("house_id", house.id),
+      supabase.from("settlements").select("*").eq("house_id", house.id),
+      supabase.from("deposit_contributions").select("*").eq("member_id", currentMember.id),
+    ])
 
-    const { data: expensesRaw } = await supabase
-      .from("expenses")
-      .select("*")
-      .eq("house_id", house.id)
-
-    const { data: settlementsRaw } = await supabase
-      .from("settlements")
-      .select("*")
-      .eq("house_id", house.id)
-
-    const { data: depositsRaw } = await supabase
-      .from("deposit_contributions")
-      .select("*")
-      .eq("member_id", currentMember.id)
-
-    if (membersRaw) {
-      const mapped: MemberWithProfile[] = membersRaw.map((m, idx) => ({
+    if (membersRes.data) {
+      setMembers(membersRes.data.map((m, idx) => ({
         ...m,
         profiles: undefined,
         profile: {
@@ -140,13 +131,12 @@ export default function ProfiloPage() {
           avatar_color: m.profiles?.avatar_color ?? AVATAR_COLORS[idx % AVATAR_COLORS.length],
         },
         short: initials(m.profiles?.full_name ?? "C"),
-      }))
-      setMembers(mapped)
+      })))
     }
 
-    if (expensesRaw) setExpenses(expensesRaw)
-    if (settlementsRaw) setSettlements(settlementsRaw)
-    if (depositsRaw) setDeposits(depositsRaw)
+    if (expensesRes.data) setExpenses(expensesRes.data)
+    if (settlementsRes.data) setSettlements(settlementsRes.data)
+    if (depositsRes.data) setDeposits(depositsRes.data)
     setLoading(false)
   }
 
@@ -165,6 +155,38 @@ export default function ProfiloPage() {
   const contractEnd = house.contract_end
     ? new Date(house.contract_end).toLocaleDateString("it-IT", { day: "numeric", month: "short", year: "numeric" })
     : "—"
+
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith("image/")) { setUploadError("Seleziona un'immagine"); return }
+    if (file.size > 5 * 1024 * 1024) { setUploadError("Immagine troppo grande (max 5 MB)"); return }
+
+    setUploading(true)
+    setUploadError(null)
+    const supabase = createClient()
+
+    const ext = file.name.split(".").pop() ?? "jpg"
+    const path = `${profile.id}/avatar.${ext}`
+
+    const { error: uploadErr } = await supabase.storage
+      .from("avatars")
+      .upload(path, file, { upsert: true, contentType: file.type })
+
+    if (uploadErr) {
+      setUploadError("Upload fallito. Riprova.")
+      setUploading(false)
+      return
+    }
+
+    const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(path)
+    const urlWithBust = `${publicUrl}?t=${Date.now()}`
+
+    await supabase.from("profiles").update({ avatar_url: publicUrl }).eq("id", profile.id)
+    setAvatarUrl(urlWithBust)
+    setUploading(false)
+    if (fileInputRef.current) fileInputRef.current.value = ""
+  }
 
   async function handleAddDeposit(amount: number) {
     const supabase = createClient()
@@ -200,20 +222,62 @@ export default function ProfiloPage() {
           <Skeleton />
         ) : (
           <>
+            {/* Profile card */}
             <div style={{ ...card(), display: "flex", alignItems: "center", gap: 14, marginTop: 4 }}>
-              <div style={{
-                width: 52, height: 52, borderRadius: 99,
-                background: profile.avatar_color,
-                color: "#fff", display: "flex", alignItems: "center",
-                justifyContent: "center", fontWeight: 700, fontSize: 19,
-              }}>
-                {currentMember.short}
-              </div>
-              <div>
+              {/* Avatar — tappable */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: "none" }}
+                onChange={handleAvatarChange}
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                aria-label="Cambia foto profilo"
+                style={{
+                  position: "relative", flexShrink: 0,
+                  width: 60, height: 60, borderRadius: 99,
+                  background: "none", border: "none", padding: 0, cursor: "pointer",
+                  opacity: uploading ? 0.6 : 1,
+                }}
+              >
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt="Avatar"
+                    style={{ width: 60, height: 60, borderRadius: 99, objectFit: "cover", display: "block" }}
+                  />
+                ) : (
+                  <div style={{
+                    width: 60, height: 60, borderRadius: 99,
+                    background: profile.avatar_color,
+                    color: "#fff", display: "flex", alignItems: "center",
+                    justifyContent: "center", fontWeight: 700, fontSize: 21,
+                  }}>
+                    {currentMember.short}
+                  </div>
+                )}
+                {/* Camera badge */}
+                <div style={{
+                  position: "absolute", bottom: 0, right: 0,
+                  width: 22, height: 22, borderRadius: 99,
+                  background: C.sageDeep, border: "2px solid #fff",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <Camera size={11} color="#fff" />
+                </div>
+              </button>
+
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <div className="disp" style={{ fontSize: 19, fontWeight: 700 }}>{profile.full_name}</div>
                 <div style={{ fontSize: 13, color: C.sub }}>
                   {currentMember.room_label ?? "Stanza"} · in casa da {joinedAt}
                 </div>
+                {uploadError && (
+                  <div style={{ fontSize: 13, color: C.coral, marginTop: 4 }}>{uploadError}</div>
+                )}
               </div>
             </div>
 
